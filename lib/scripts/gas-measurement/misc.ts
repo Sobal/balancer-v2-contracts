@@ -22,24 +22,33 @@ export async function setupEnvironment(): Promise<{
 }> {
   const { admin, creator, trader } = await getSigners();
 
+  console.log('deploy weth')
   const weth = await deploy('WETH', { args: [admin.address] });
-
+  
+  console.log('deploy authorizer')
   const authorizer = await deploy('Authorizer', { args: [admin.address] });
-
+  
+  console.log('deploy vault')
   const vault = await deploy('Vault', { args: [authorizer.address, weth.address, 0, 0] });
-
+  
+  console.log('deploy tokens')
   const tokens = await deploySortedTokens(tokenSymbols, Array(tokenSymbols.length).fill(18));
 
   const symbols = Object.keys(tokens);
   const tokenAddresses = symbols.map((symbol) => tokens[symbol].address);
 
   for (const symbol in tokens) {
+    console.log('creator approving vault', tokens[symbol].address)
     // creator tokens are used to initialize pools, but tokens are only minted when required
     await tokens[symbol].connect(creator).approve(vault.address, MAX_UINT256);
-
+    
+    console.log('minting', tokens[symbol].address)
     // trader tokens are used to trade and not have non-zero balances
     await mintTokens(tokens, symbol, trader, 200e18);
+
+    console.log('trader approving vault')
     await tokens[symbol].connect(trader).approve(vault.address, MAX_UINT256);
+    
   }
 
   // deposit internal balance for trader to make it non-zero
@@ -54,7 +63,7 @@ export async function setupEnvironment(): Promise<{
       recipient: trader.address,
     });
   }
-
+  console.log('Transfer tokens to trader (?)')
   await vault.connect(trader).manageUserBalance(transfers);
 
   return { vault, tokens, trader };
@@ -64,7 +73,7 @@ export async function deployPool(vault: Contract, tokens: TokenList, poolName: P
   const { creator } = await getSigners();
 
   const symbols = Object.keys(tokens);
-
+  console.log(symbols)
   const initialPoolBalance = bn(100e18);
   for (const symbol of symbols) {
     await mintTokens(tokens, symbol, creator, initialPoolBalance);
@@ -78,13 +87,13 @@ export async function deployPool(vault: Contract, tokens: TokenList, poolName: P
 
   if (poolName == 'WeightedPool') {
     const weights = toNormalizedWeights(symbols.map(() => fp(1))); // Equal weights for all tokens
-
     pool = await deployPoolFromFactory(vault, 'WeightedPool', {
       from: creator,
       parameters: [tokenAddresses, weights, swapFeePercentage],
     });
-
+    console.log('New pool deployed', pool.address)
     joinUserData = encodeJoinWeightedPool({ kind: 'Init', amountsIn: tokenAddresses.map(() => initialPoolBalance) });
+    // console.log(joinUserData
   } else if (poolName == 'StablePool') {
     const amplificationParameter = bn(50e18);
 
@@ -99,14 +108,12 @@ export async function deployPool(vault: Contract, tokens: TokenList, poolName: P
   }
 
   const poolId = await pool.getPoolId();
-
   await vault.connect(creator).joinPool(poolId, creator.address, creator.address, {
     assets: tokenAddresses,
     maxAmountsIn: tokenAddresses.map(() => initialPoolBalance), // These end up being the actual join amounts
     fromInternalBalance: false,
     userData: joinUserData,
   });
-
   return poolId;
 }
 

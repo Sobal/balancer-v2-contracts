@@ -47,7 +47,7 @@ async function main() {
   const exitStableUserData = encodeExitStablePool({ kind: 'ExactBPTInForTokensOut', bptAmountIn: BPTAmount });
 
   // numTokens is the size of the pool: 2,4,6,8
-  for (let numTokens = 2; numTokens <= 8; numTokens += 2) {
+  for (let numTokens = 8; numTokens <= 8; numTokens += 2) {
     printTokens('Weighted pool', numTokens);
     await joinAndExitPool(
       () => getWeightedPool(vault, tokens, numTokens),
@@ -188,6 +188,7 @@ async function joinAndExitPool(
   let bpt;
 
   for (let idx = 1; idx <= stageIdx; idx++) {
+    console.log('join pool', trader.address, poolId, idx)
     receipt = await (await vault.connect(trader).joinPool(poolId, trader.address, trader.address, joinRequest)).wait();
     console.log(`${printGas(receipt.gasUsed)} gas for join ${idx}`);
 
@@ -199,6 +200,7 @@ async function joinAndExitPool(
 
   // Now exit the pool
   for (let idx = 1; idx <= stageIdx; idx++) {
+    console.log('exit pool', trader.address, poolId, idx)
     receipt = await (await vault.connect(trader).exitPool(poolId, trader.address, trader.address, exitRequest)).wait();
     console.log(`${printGas(receipt.gasUsed)} gas for exit ${idx}`);
 

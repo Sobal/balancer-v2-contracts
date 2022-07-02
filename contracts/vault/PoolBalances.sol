@@ -48,9 +48,16 @@ abstract contract PoolBalances is Fees, ReentrancyGuard, PoolTokens, UserBalance
     ) external payable override whenNotPaused {
         // This function doesn't have the nonReentrant modifier: it is applied to `_joinOrExit` instead.
 
+        PoolBalanceChange memory change;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            change := request
+        }
+
         // Note that `recipient` is not actually payable in the context of a join - we cast it because we handle both
         // joins and exits at once.
-        _joinOrExit(PoolBalanceChangeKind.JOIN, poolId, sender, payable(recipient), _toPoolBalanceChange(request));
+
+        _joinOrExit(PoolBalanceChangeKind.JOIN, poolId, sender, payable(recipient), change);
     }
 
     function exitPool(
@@ -59,8 +66,13 @@ abstract contract PoolBalances is Fees, ReentrancyGuard, PoolTokens, UserBalance
         address payable recipient,
         ExitPoolRequest memory request
     ) external override {
+        PoolBalanceChange memory change;
+        // solhint-disable-next-line no-inline-assembly
+        assembly {
+            change := request
+        }
         // This function doesn't have the nonReentrant modifier: it is applied to `_joinOrExit` instead.
-        _joinOrExit(PoolBalanceChangeKind.EXIT, poolId, sender, recipient, _toPoolBalanceChange(request));
+        _joinOrExit(PoolBalanceChangeKind.EXIT, poolId, sender, recipient, change);
     }
 
     // This has the exact same layout as JoinPoolRequest and ExitPoolRequest, except the `maxAmountsIn` and
@@ -73,33 +85,34 @@ abstract contract PoolBalances is Fees, ReentrancyGuard, PoolTokens, UserBalance
         bool useInternalBalance;
     }
 
-    /**
-     * @dev Converts a JoinPoolRequest into a PoolBalanceChange, with no runtime cost.
-     */
-    function _toPoolBalanceChange(JoinPoolRequest memory request)
-        private
-        pure
-        returns (PoolBalanceChange memory change)
-    {
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            change := request
-        }
-    }
+    // /**
+    //  * @dev Converts a JoinPoolRequest into a PoolBalanceChange, with no runtime cost.
+    //  */
+    // function _toPoolBalanceChange(JoinPoolRequest memory request)
+    //     private
+    //     pure
+    //     returns (PoolBalanceChange memory change)
+    // {
+    //     // solhint-disable-next-line no-inline-assembly
+    //     assembly {
+    //         change := request
+    //     }
+    // }
 
-    /**
-     * @dev Converts an ExitPoolRequest into a PoolBalanceChange, with no runtime cost.
-     */
-    function _toPoolBalanceChange(ExitPoolRequest memory request)
-        private
-        pure
-        returns (PoolBalanceChange memory change)
-    {
-        // solhint-disable-next-line no-inline-assembly
-        assembly {
-            change := request
-        }
-    }
+    // /**
+    //  * @dev Converts an ExitPoolRequest into a PoolBalanceChange, with no runtime cost.
+    //  */
+    // function _toPoolBalanceChange(ExitPoolRequest memory request)
+    //     private
+    //     pure
+    //     returns (PoolBalanceChange memory change)
+    // {
+    //     PoolBalanceChange memory change;
+    //     // solhint-disable-next-line no-inline-assembly
+    //     assembly {
+    //         change := request
+    //     }
+    // }
 
     /**
      * @dev Implements both `joinPool` and `exitPool`, based on `kind`.

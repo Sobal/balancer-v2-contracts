@@ -29,15 +29,15 @@ async function main() {
   await singlePair(() => getWeightedPool(vault, tokens, 4), false);
   await singlePair(() => getWeightedPool(vault, tokens, 4), true);
 
-  console.log(`\n# Stable Pools with 2 tokens`);
+  // console.log(`\n# Stable Pools with 2 tokens`);
 
-  await singlePair(() => getStablePool(vault, tokens, 2), false);
-  await singlePair(() => getStablePool(vault, tokens, 2), true);
+  // await singlePair(() => getStablePool(vault, tokens, 2), false);
+  // await singlePair(() => getStablePool(vault, tokens, 2), true);
 
-  console.log(`\n# Stable Pools with 4 tokens`);
+  // console.log(`\n# Stable Pools with 4 tokens`);
 
-  await singlePair(() => getStablePool(vault, tokens, 4), false);
-  await singlePair(() => getStablePool(vault, tokens, 4), true);
+  // await singlePair(() => getStablePool(vault, tokens, 4), false);
+  // await singlePair(() => getStablePool(vault, tokens, 4), true);
 }
 
 async function singlePair(getPoolId: () => Promise<string>, useInternalBalance: boolean) {
@@ -60,6 +60,7 @@ async function singlePair(getPoolId: () => Promise<string>, useInternalBalance: 
   const tokenOut = tokenSymbols[1];
 
   for (let poolAmount = 1; poolAmount <= MAX_POOLS; ++poolAmount) {
+
     if (poolAmount == 1) {
       const receipt = await (
         await vault.connect(trader).swap(

@@ -12,11 +12,11 @@ export default async function (hre: HardhatRuntimeEnvironment): Promise<void> {
     log: true,
   });
 
-  await deploy('WETH', {
-    from: deployer,
-    args: [deployer],
-    log: true,
-  });
+  // await deploy('WETH', {
+  //   from: deployer,
+  //   args: [deployer],
+  //   log: true,
+  // });
 
   await deploy('Multicall', {
     from: deployer,

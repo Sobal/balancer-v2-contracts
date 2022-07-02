@@ -15,10 +15,10 @@ export default async function (hre: HardhatRuntimeEnvironment): Promise<void> {
   });
 
   if (hre.network.live) {
-    await tenderly.push({
-      name: 'WeightedPoolFactory',
-      address: weightedFactory.address,
-    });
+    // await tenderly.push({
+    //   name: 'WeightedPoolFactory',
+    //   address: weightedFactory.address,
+    // });
   }
 
   const stableFactory = await deploy('StablePoolFactory', {
@@ -28,9 +28,9 @@ export default async function (hre: HardhatRuntimeEnvironment): Promise<void> {
   });
 
   if (hre.network.live) {
-    await tenderly.push({
-      name: 'StablePoolFactory',
-      address: stableFactory.address,
-    });
+    // await tenderly.push({
+    //   name: 'StablePoolFactory',
+    //   address: stableFactory.address,
+    // });
   }
 }

@@ -16,6 +16,7 @@ export default async function (hre: HardhatRuntimeEnvironment): Promise<void> {
   } else {
     WETH = await (await deployments.get('WETH')).address;
   }
+  // WETH = '0x65976a250187cb1D21b7e3693aCF102d61c86177'
 
   const vault = await deploy('Vault', {
     from: deployer,
@@ -24,9 +25,9 @@ export default async function (hre: HardhatRuntimeEnvironment): Promise<void> {
   });
 
   if (hre.network.live && vault.newlyDeployed) {
-    await tenderly.push({
-      name: 'Vault',
-      address: vault.address,
-    });
+    // await tenderly.push({
+    //   name: 'Vault',
+    //   address: vault.address,
+    // });
   }
 }
