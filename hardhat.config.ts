@@ -95,6 +95,18 @@ export default {
         OTHER_PRIVATE_KEY, // other
       ],
       saveDeployments: true
+    },
+    neonlabs2: {
+      chainId: 111,
+      url: 'https://proxy-test.neontest.xyz/solana',
+      accounts: [
+        DEPLOYER_PRIVATE_KEY, // deployer
+        ADMIN_PRIVATE_KEY, // admin
+        CREATOR_PRIVATE_KEY, // creator
+        TRADER_PRIVATE_KEY, // trader
+        OTHER_PRIVATE_KEY, // other
+      ],
+      saveDeployments: true
     }
   },
   namedAccounts: {
