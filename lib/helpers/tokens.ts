@@ -34,10 +34,12 @@ export async function deploySortedTokens(
   console.log(deployer.address)
   const tokens = []
   for (let index = 0; index < symbols.length; index++) {
+
     const symbol = symbols[index];
     const decimal = decimals[index]
     const token = await deployToken(`T${index}`, decimal, deployer)
     tokens.push(token)
+    console.log('token', index)
   }
 
   return fromPairs(
@@ -64,5 +66,13 @@ export async function mintTokens(
   recipient: SignerWithAddress | string,
   amount: number | BigNumber | string
 ): Promise<void> {
-  await tokens[symbol].mint(typeof recipient == 'string' ? recipient : recipient.address, amount.toString());
+  console.log('Minting', symbol, amount, typeof recipient == 'string' ? recipient : recipient.address)
+  const tx = await tokens[symbol].mint(
+    typeof recipient == 'string' ? recipient : recipient.address,
+    amount.toString(),
+    {
+      gasLimit: 1200000
+    }
+  );
+  await tx.wait()
 }

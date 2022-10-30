@@ -20,18 +20,18 @@ async function main() {
 
   console.log(`\n# Weighted Pool with 2 tokens`);
 
-  await multihop((index: number) => getWeightedPool(vault, tokens, 2, index), false);
-  await multihop((index: number) => getWeightedPool(vault, tokens, 2, index), true);
+  // await multihop((index: number) => getWeightedPool(vault, tokens, 2, index), false);
+  // await multihop((index: number) => getWeightedPool(vault, tokens, 2, index), true);
 
-  console.log(`\n# Weighted Pool with 4 tokens`);
+  // console.log(`\n# Weighted Pool with 4 tokens`);
 
-  await multihop((index: number) => getWeightedPool(vault, tokens, 4, index), false);
-  await multihop((index: number) => getWeightedPool(vault, tokens, 4, index), true);
+  // await multihop((index: number) => getWeightedPool(vault, tokens, 4, index), false);
+  // await multihop((index: number) => getWeightedPool(vault, tokens, 4, index), true);
 
-  console.log(`\n# Stable Pool with 2 tokens`);
+  // console.log(`\n# Stable Pool with 2 tokens`);
 
-  await multihop((index: number) => getStablePool(vault, tokens, 2, index), false);
-  await multihop((index: number) => getStablePool(vault, tokens, 2, index), true);
+  // await multihop((index: number) => getStablePool(vault, tokens, 2, index), false);
+  // await multihop((index: number) => getStablePool(vault, tokens, 2, index), true);
 
   console.log(`\n# Stable Pool with 4 tokens`);
 
@@ -52,9 +52,11 @@ async function multihop(getPool: (index: number) => Promise<string>, useInternal
   const pools: Array<string> = [];
   for (let i = 0; i < MAX_HOPS + 1; ++i) {
     // To do n hops, we need n+1 pools
+    console.log('hop', i)
     pools.push(await getPool(i));
   }
 
+  console.log('building trades')
   for (let numHops = 1; numHops <= MAX_HOPS; ++numHops) {
     const trades = pools.slice(0, numHops).map((poolId, index) => {
       const tokenIn = tokenSymbols[index];
@@ -69,8 +71,9 @@ async function multihop(getPool: (index: number) => Promise<string>, useInternal
       }
     });
 
+    
     const [tokenAddresses, swaps] = getTokensSwaps(tokens, trades);
-
+    console.log(tokenAddresses)
     const receipt = await (
       await vault
         .connect(trader)

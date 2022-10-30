@@ -1,6 +1,6 @@
 import { ethers } from 'hardhat';
 import { Dictionary } from 'lodash';
-import { Contract, ContractFactory } from 'ethers';
+import { Contract, ContractFactory, providers } from 'ethers';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 
 // TODO: Model deployer
@@ -17,7 +17,9 @@ export async function deploy(contract: string, { from, args }: ContractDeploymen
   if (!from) from = (await ethers.getSigners())[0];
   const factory = (await getFactory(contract)).connect(from);
   const instance = await factory.deploy(...args);
-  return instance.deployed();
+  
+  console.log('Deployed', contract, 'at', instance.address)
+  return instance.deployed()
 }
 
 export async function getFactory(contractName: string): Promise<ContractFactory> {

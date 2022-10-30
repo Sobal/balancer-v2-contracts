@@ -12,25 +12,47 @@ import { encodeJoinWeightedPool } from '../../helpers/weightedPoolEncoding';
 import { bn } from '../../helpers/numbers';
 import { deployPoolFromFactory, PoolName } from '../../helpers/pools';
 import { deploySortedTokens, mintTokens, TokenList } from '../../helpers/tokens';
+// import { getContractFactory } from '@nomiclabs/hardhat-ethers/types';
 
 export const tokenSymbols = ['AAA', 'BBB', 'CCC', 'DDD', 'EEE', 'FFF', 'GGG', 'HHH'];
 
-export async function setupEnvironment(): Promise<{
-  vault: Contract;
-  tokens: TokenList;
-  trader: SignerWithAddress;
-}> {
+const contracts = {
+  authorizer: '0x00FB9D7A643B16BC1fAF1fFF394ec19B9f6DA1B8',
+  vault: '0xDE45364D568CD5C8229e6e16A850e8861046D6Dd',
+  weightedPoolFactory: '0xD0eD525cBAb7734C7901788d547e0196711d5660',
+  stablePoolFactory: '0xEfC650c01B91753640C50A80f4bA3134FbD5e7a2',
+  balancerHelpers: '0xE773F4db703aA5c4E4bF9ACd2ADE3383051EBA97'
+}
+
+export async function setupEnvironment(): Promise<any> {
   const { admin, creator, trader } = await getSigners();
 
-  console.log('deploy weth')
-  const weth = await deploy('WETH', { args: [admin.address] });
+  console.log('admin', admin.address)
+  console.log('creator', creator.address)
+  console.log('trader', trader.address)
+
+  // const weth = await deploy('WETH', { args: [admin.address] });
+  const authorizer = (
+    await ethers.getContractFactory('Authorizer', admin)
+    ).attach(contracts.authorizer)
   
-  console.log('deploy authorizer')
-  const authorizer = await deploy('Authorizer', { args: [admin.address] });
+
+  const weth =  (
+    await ethers.getContractFactory('WETH', admin)
+  ).attach('0x65976a250187cb1D21b7e3693aCF102d61c86177')
   
-  console.log('deploy vault')
-  const vault = await deploy('Vault', { args: [authorizer.address, weth.address, 0, 0] });
+  // const WETH =  {
+  //   address: '0x65976a250187cb1D21b7e3693aCF102d61c86177'
+  // }
+  const vault = (
+    await ethers.getContractFactory('Vault', admin)
+  ).attach(contracts.vault)
   
+
+  // const authorizer = await deploy('Authorizer', { args: [admin.address] });
+  
+  // const vault = await deploy('Vault', { args: [authorizer.address, weth.address, 0, 0] });
+    
   console.log('deploy tokens')
   const tokens = await deploySortedTokens(tokenSymbols, Array(tokenSymbols.length).fill(18));
 
@@ -93,7 +115,7 @@ export async function deployPool(vault: Contract, tokens: TokenList, poolName: P
     });
     console.log('New pool deployed', pool.address)
     joinUserData = encodeJoinWeightedPool({ kind: 'Init', amountsIn: tokenAddresses.map(() => initialPoolBalance) });
-    // console.log(joinUserData
+    // console.log(joinUserData)
   } else if (poolName == 'StablePool') {
     const amplificationParameter = bn(50e18);
 
@@ -108,12 +130,14 @@ export async function deployPool(vault: Contract, tokens: TokenList, poolName: P
   }
 
   const poolId = await pool.getPoolId();
+  console.log('Joining to pool', poolId)
   await vault.connect(creator).joinPool(poolId, creator.address, creator.address, {
     assets: tokenAddresses,
     maxAmountsIn: tokenAddresses.map(() => initialPoolBalance), // These end up being the actual join amounts
     fromInternalBalance: false,
     userData: joinUserData,
   });
+  console.log('Joined')
   return poolId;
 }
 

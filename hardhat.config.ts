@@ -86,7 +86,8 @@ export default {
     },
     neonlabs: {
       chainId: 245022926,
-      url: 'https://proxy.devnet.neonlabs.org/solana',
+      // url: 'https://proxy.devnet.neonlabs.org/solana',
+      url: 'https://devnet.neonevm.org',
       accounts: [
         DEPLOYER_PRIVATE_KEY, // deployer
         ADMIN_PRIVATE_KEY, // admin
@@ -99,6 +100,32 @@ export default {
     neonlabs2: {
       chainId: 111,
       url: 'https://proxy-test.neontest.xyz/solana',
+      accounts: [
+        DEPLOYER_PRIVATE_KEY, // deployer
+        ADMIN_PRIVATE_KEY, // admin
+        CREATOR_PRIVATE_KEY, // creator
+        TRADER_PRIVATE_KEY, // trader
+        OTHER_PRIVATE_KEY, // other
+      ],
+      saveDeployments: true
+    },
+    localneon: {
+      chainId: 111,
+      url: 'http://127.0.0.1:9090',
+      accounts: [
+        DEPLOYER_PRIVATE_KEY, // deployer
+        ADMIN_PRIVATE_KEY, // admin
+        CREATOR_PRIVATE_KEY, // creator
+        TRADER_PRIVATE_KEY, // trader
+        OTHER_PRIVATE_KEY, // other
+      ],
+      saveDeployments: true
+    },
+    graphneon: {
+      // chainId: 111,
+      chainId: 245022926,
+      // url: 'https://proxy.devnet.neonlabs.org/solana',
+      url: 'https://graph.neontest.xyz/neon-rpc',
       accounts: [
         DEPLOYER_PRIVATE_KEY, // deployer
         ADMIN_PRIVATE_KEY, // admin
