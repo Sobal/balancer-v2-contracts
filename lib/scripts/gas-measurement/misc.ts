@@ -17,11 +17,12 @@ import { deploySortedTokens, mintTokens, TokenList } from '../../helpers/tokens'
 export const tokenSymbols = ['AAA', 'BBB', 'CCC', 'DDD', 'EEE', 'FFF', 'GGG', 'HHH'];
 
 const contracts = {
-  authorizer: '0x00FB9D7A643B16BC1fAF1fFF394ec19B9f6DA1B8',
-  vault: '0xDE45364D568CD5C8229e6e16A850e8861046D6Dd',
-  weightedPoolFactory: '0xD0eD525cBAb7734C7901788d547e0196711d5660',
-  stablePoolFactory: '0xEfC650c01B91753640C50A80f4bA3134FbD5e7a2',
-  balancerHelpers: '0xE773F4db703aA5c4E4bF9ACd2ADE3383051EBA97'
+  authorizer: '0x79C99777616b37f5535FbeACDC1a2576e350adB2',
+  vault: '0x4EEa42d660B338D2324cd2E171DDC5678Cf63339',
+  weightedPoolFactory: '0x8f8982bB0bB046e825Ff3Dc0C197A867E6e7EC19',
+  stablePoolFactory: '0x7eaDa2d1Bc3C21A6170343b95701fa16aa49B03e',
+  weighted2Poolfactory: '0x60caA0bFbcaf4B117ccd9C53208396ee13F6cAfE',
+  balancerHelpers: '0x9f72b41F88197d42BFc16BBBB064142EB6BFFEC5'
 }
 
 export async function setupEnvironment(): Promise<any> {
