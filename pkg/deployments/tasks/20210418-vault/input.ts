@@ -41,4 +41,11 @@ export default {
     pauseWindowDuration: 3 * MONTH,
     bufferPeriodDuration: MONTH,
   },
+  neonlabs: {
+    authorizer,
+    weth: '0x65976a250187cb1D21b7e3693aCF102d61c86177',
+    pauseWindowDuration: 3 * MONTH,
+    bufferPeriodDuration: MONTH,
+
+  }
 };

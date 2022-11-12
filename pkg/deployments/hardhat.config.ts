@@ -7,6 +7,8 @@ import { HardhatRuntimeEnvironment } from 'hardhat/types';
 import Task from './src/task';
 import { Logger } from './src/logger';
 
+import 'dotenv/config';
+
 task('deploy', 'Run deployment task')
   .addParam('id', 'Deployment task ID')
   .addOptionalParam('force', 'Ignore previous deployments')
@@ -15,4 +17,20 @@ task('deploy', 'Run deployment task')
     await new Task(args.id, hre.network.name).run(args.force);
   });
 
-export default {};
+export default {
+    networks: {
+      neonlabs: {
+        chainId: 245022926,
+        url: 'https://devnet.neonevm.org',
+        accounts: [
+          process.env.DEPLOYER_PRIVATE_KEY,
+          process.env.CONTROLLER_PRIVATE_KEY,
+          process.env.ADMIN_PRIVATE_KEY,
+          process.env.CREATOR_PRIVATE_KEY,
+          process.env.TRADER_PRIVATE_KEY,
+          process.env.OTHER_PRIVATE_KEY,
+        ],
+        saveDeployments: true
+    }
+    }
+}
