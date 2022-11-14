@@ -23,7 +23,7 @@ export default async function (hre: HardhatRuntimeEnvironment): Promise<void> {
 
   const vault = await deploy('Vault', {
     from: deployer,
-    args: [authorizer.address, WETH.address, THREE_MONTHS, MONTH],
+    args: [authorizer.address, WETH, THREE_MONTHS, MONTH],
     log: true,
   });
 

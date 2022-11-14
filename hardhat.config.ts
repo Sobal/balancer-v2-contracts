@@ -5,10 +5,14 @@ import 'hardhat-deploy';
 import 'hardhat-local-networks-config-plugin';
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-etherscan';
 
-import { task } from 'hardhat/config';
+import { extendEnvironment, task } from 'hardhat/config';
 import { TASK_COMPILE } from 'hardhat/builtin-tasks/task-names';
 import overrideQueryFunctions from './lib/scripts/plugins/overrideQueryFunctions';
+
+import {TASK_COMPILE_SOLIDITY_COMPILE_SOLC} from "hardhat/builtin-tasks/task-names"
+import Verifier from './lib/scripts/plugins/verifier';
 
 task(TASK_COMPILE).setAction(overrideQueryFunctions);
 
@@ -37,6 +41,21 @@ const ADMIN_PRIVATE_KEY = process.env.CONTROLLER_PRIVATE_KEY || '';
 const CREATOR_PRIVATE_KEY = process.env.CREATOR_PRIVATE_KEY || '';
 const TRADER_PRIVATE_KEY = process.env.CONTROLLER_PRIVATE_KEY || '';
 const OTHER_PRIVATE_KEY = process.env.OTHER_PRIVATE_KEY || '';
+
+
+declare module "hardhat/types/runtime" {
+  export interface HardhatRuntimeEnvironment {
+    neonscan: {
+      verifier: Verifier;
+    }
+  }
+}
+
+extendEnvironment((hre) => {
+  hre.neonscan = {
+    verifier: new Verifier(hre.network, 'no-api-key')
+  }
+})
 
 export default {
   networks: {
@@ -201,4 +220,20 @@ export default {
     deploy: 'deployments/migrations',
     deployments: 'deployments/artifacts',
   },
+    etherscan: {
+       apiKey: {
+          neonlabs: 'A'
+        },
+       customChains: [
+          {
+            network: "neonlabs",
+            chainId: 245022926,
+           urls: {
+              apiURL: 'https://beta-devnet-api.neonscan.org/contract/verify',
+              browserURL: 'https://neonscan.org'
+            }
+          }
+        ]
+      }
+    
 };
