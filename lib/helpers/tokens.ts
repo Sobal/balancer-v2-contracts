@@ -4,6 +4,7 @@ import { Dictionary, fromPairs } from 'lodash';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { ZERO_ADDRESS } from './constants';
 import { deploy } from './deploy';
+import { formatEther, parseEther } from 'ethers/lib/utils';
 
 export type TokenList = Dictionary<Contract>;
 
@@ -37,6 +38,7 @@ export async function deploySortedTokens(
 
     const symbol = symbols[index];
     const decimal = decimals[index]
+    console.log(symbol)
     const token = await deployToken(`T${index}`, decimal, deployer)
     tokens.push(token)
     console.log('token', index)
@@ -66,13 +68,18 @@ export async function mintTokens(
   recipient: SignerWithAddress | string,
   amount: number | BigNumber | string
 ): Promise<void> {
-  console.log('Minting', symbol, amount, typeof recipient == 'string' ? recipient : recipient.address)
+  console.log(`Minting ${formatEther(amount.toString()).toString()} ${symbol} for ${typeof recipient == 'string' ? recipient : recipient.address}`)
+  console.log(`${symbol} total supply: ${formatEther(await tokens[symbol].totalSupply())}`)
   const tx = await tokens[symbol].mint(
     typeof recipient == 'string' ? recipient : recipient.address,
     amount.toString(),
     {
-      gasLimit: 1200000
+      gasLimit: 1600000
     }
   );
+  console.log('waiting for receipt')
   await tx.wait()
+  // console.log('minted!')
+  console.log(`${symbol} total supply increased to: ${formatEther(await tokens[symbol].totalSupply())}`)
+
 }

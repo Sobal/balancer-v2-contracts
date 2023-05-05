@@ -29,3 +29,23 @@ Gas measurements of common tasks can be obtained by running `yarn benchmark`.
   - `test` holds contracts that are only used for testing purposes, often with lax access control patterns and other 'unsafe' properties.
 - `test`: unit tests for each smart contract, using [ethers](https://docs.ethers.io/v5/) and [waffle chai matchers](https://ethereum-waffle.readthedocs.io/en/latest/matchers.html). The `helpers` subdirectory holds utilities used to simplify writing assertions, deploying test contracts, etc., with the overall goal of making tests more ergonomic and less verbose.
 - `scripts`: these execute tasks unrelated to testing, such as gas benchmarking, deployment, etc. The `helpers` subdirectory contains specialized utilities for our project to e.g. make deployment easier - some of these are also used in the tests.
+
+## NeonEVM
+
+To deploy the right version of each contract we need to checkout between banches due to contract changes and issues during the integration with NeonEVM.
+
+The basic deployment: Authorizer, Vault, WETH and Weighted Pools
+```
+git checkout neonlabs-deploy
+
+yarn hardhat deploy --network neonlabs
+
+# replace deployed addresses in lib/scripts/gas-measurement/contracts.ts
+
+# these usually pass without issues 
+yarn measure-gas-multihop --network neonlabs
+
+# join/exit from 4 tokens pool tends to fail
+yarn measure-gas-join-exit --network neonlabs
+
+```

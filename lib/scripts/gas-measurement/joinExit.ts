@@ -47,7 +47,7 @@ async function main() {
   const exitStableUserData = encodeExitStablePool({ kind: 'ExactBPTInForTokensOut', bptAmountIn: BPTAmount });
 
   // numTokens is the size of the pool: 2,4,6,8
-  for (let numTokens = 8; numTokens <= 8; numTokens += 2) {
+  for (let numTokens = 2; numTokens <= 8; numTokens += 2) {
     printTokens('Weighted pool', numTokens);
     await joinAndExitPool(
       () => getWeightedPool(vault, tokens, numTokens),
@@ -61,16 +61,16 @@ async function main() {
 
   // numTokens is the size of the pool: 2,4
   // Stable have a max of 5
-  for (let numTokens = 2; numTokens <= 4; numTokens += 2) {
-    printTokens('Stable pool', numTokens);
-    await joinAndExitPool(
-      () => getStablePool(vault, tokens, numTokens),
-      numTokens,
-      true,
-      joinStableUserData,
-      exitStableUserData
-    );
-  }
+  // for (let numTokens = 2; numTokens <= 4; numTokens += 2) {
+  //   printTokens('Stable pool', numTokens);
+  //   await joinAndExitPool(
+  //     () => getStablePool(vault, tokens, numTokens),
+  //     numTokens,
+  //     true,
+  //     joinStableUserData,
+  //     exitStableUserData
+  //   );
+  // }
   console.log('\n');
 
   console.log(`#With user balance\n`);
@@ -90,16 +90,16 @@ async function main() {
 
   // numTokens is the size of the pool: 2,4
   // Stable have a max of 5
-  for (let numTokens = 2; numTokens <= 4; numTokens += 2) {
-    printTokens('Stable pool', numTokens);
-    await joinAndExitPool(
-      () => getStablePool(vault, tokens, numTokens),
-      numTokens,
-      false,
-      joinStableUserData,
-      exitStableUserData
-    );
-  }
+  // for (let numTokens = 2; numTokens <= 4; numTokens += 2) {
+  //   printTokens('Stable pool', numTokens);
+  //   await joinAndExitPool(
+  //     () => getStablePool(vault, tokens, numTokens),
+  //     numTokens,
+  //     false,
+  //     joinStableUserData,
+  //     exitStableUserData
+  //   );
+  // }
   console.log('\n');
 
   console.log('== Partial Join/Exit (2-stage entry/exit) ==');
@@ -119,17 +119,18 @@ async function main() {
   }
   console.log('\n');
 
-  for (let numTokens = 2; numTokens <= 4; numTokens += 2) {
-    printTokens('Stable pool', numTokens);
-    await joinAndExitPool(
-      () => getStablePool(vault, tokens, numTokens),
-      numTokens,
-      true,
-      joinStableUserData,
-      exitStableUserData,
-      numberJoinsExits
-    );
-  }
+  // for (let numTokens = 2; numTokens <= 4; numTokens += 2) {
+  //   printTokens('Stable pool', numTokens);
+  //   await joinAndExitPool(
+  //     () => getStablePool(vault, tokens, numTokens),
+  //     numTokens,
+  //     true,
+  //     joinStableUserData,
+  //     exitStableUserData,
+  //     numberJoinsExits
+  //   );
+  // }
+
   console.log('\n');
 
   console.log(`#With user balance\n`);
@@ -147,17 +148,17 @@ async function main() {
   }
   console.log('\n');
 
-  for (let numTokens = 2; numTokens <= 4; numTokens += 2) {
-    printTokens('Stable pool', numTokens);
-    await joinAndExitPool(
-      () => getStablePool(vault, tokens, numTokens),
-      numTokens,
-      false,
-      joinStableUserData,
-      exitStableUserData,
-      numberJoinsExits
-    );
-  }
+  // for (let numTokens = 2; numTokens <= 4; numTokens += 2) {
+  //   printTokens('Stable pool', numTokens);
+  //   await joinAndExitPool(
+  //     () => getStablePool(vault, tokens, numTokens),
+  //     numTokens,
+  //     false,
+  //     joinStableUserData,
+  //     exitStableUserData,
+  //     numberJoinsExits
+  //   );
+  // }
 }
 
 async function joinAndExitPool(

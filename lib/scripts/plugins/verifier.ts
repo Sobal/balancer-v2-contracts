@@ -159,14 +159,20 @@ export default class Verifier {
   private _existsDir(dirPath: string): boolean {
     return fs.existsSync(dirPath) && fs.statSync(dirPath).isDirectory();
   }
-
+  async delay(milliseconds: number): Promise<void> {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, milliseconds);
+    });
+  }
   async verify(
     name: string,
     address: string,
     args: string | unknown[],
     libraries: Libraries = {}
   ): Promise<any> {
-
+    await delay(5000)
     const deployedBytecodeHex = await retrieveContractBytecode(address, this.network.provider, this.network.name);
     const deployedBytecode = new Bytecode(deployedBytecodeHex);
     const buildInfos = await this.getBuildInfos();

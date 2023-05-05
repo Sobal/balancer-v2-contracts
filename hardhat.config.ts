@@ -100,7 +100,13 @@ export default {
     goerli: {
       chainId: CHAIN_IDS.goerli,
       url: `https://goerli.infura.io/v3/${INFURA_KEY}`,
-      accounts: [`${DEPLOYER_PRIVATE_KEY}`, `${CONTROLLER_PRIVATE_KEY}`], // Using private key instead of mnemonic for vanity deploy
+      accounts: [
+        DEPLOYER_PRIVATE_KEY, // deployer
+        ADMIN_PRIVATE_KEY, // admin
+        CREATOR_PRIVATE_KEY, // creator
+        TRADER_PRIVATE_KEY, // trader
+        OTHER_PRIVATE_KEY, // other
+      ],
       saveDeployments: true,
     },
     neonlabs: {
@@ -114,6 +120,11 @@ export default {
         TRADER_PRIVATE_KEY, // trader
         OTHER_PRIVATE_KEY, // other
       ],
+      verify: {
+        etherscan: {
+          apiUrl: 'https://devnet-api.neonscan.org/hardhat/verify'
+        }
+      },
       saveDeployments: true
     },
     neonlabs2: {
@@ -224,16 +235,27 @@ export default {
        apiKey: {
           neonlabs: 'A'
         },
-       customChains: [
-          {
-            network: "neonlabs",
-            chainId: 245022926,
-           urls: {
-              apiURL: 'https://beta-devnet-api.neonscan.org/contract/verify',
-              browserURL: 'https://neonscan.org'
-            }
+      //  customChains: [
+      //     {
+      //       network: "neonlabs",
+     //       chainId: 245022926,
+      //      urls: {
+      //         apiURL: 'https://beta-devnet-api.neonscan.org/contract/verify',
+      //         browserURL: 'https://neonscan.org'
+      //       }
+      //     }
+      //   ]
+      
+      customChains: [
+        {
+          network: "neonlabs",
+          chainId: 245022926,
+          urls: {
+            apiURL: "https://devnet-api.neonscan.org/hardhat/verify",
+            browserURL: "https://devnet.neonscan.org"
           }
-        ]
+        }
+      ]
       }
     
 };

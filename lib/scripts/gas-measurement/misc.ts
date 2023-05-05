@@ -15,40 +15,23 @@ import { deploySortedTokens, mintTokens, TokenList } from '../../helpers/tokens'
 // import { getContractFactory } from '@nomiclabs/hardhat-ethers/types';
 
 export const tokenSymbols = ['AAA', 'BBB', 'CCC', 'DDD', 'EEE', 'FFF', 'GGG', 'HHH'];
+// export const tokenSymbols = ['AAA', 'BBB'] 
 
-const contracts = {
-  authorizer: '0x79C99777616b37f5535FbeACDC1a2576e350adB2',
-  vault: '0x4EEa42d660B338D2324cd2E171DDC5678Cf63339',
-  weightedPoolFactory: '0x8f8982bB0bB046e825Ff3Dc0C197A867E6e7EC19',
-  stablePoolFactory: '0x7eaDa2d1Bc3C21A6170343b95701fa16aa49B03e',
-  weighted2Poolfactory: '0x60caA0bFbcaf4B117ccd9C53208396ee13F6cAfE',
-  balancerHelpers: '0x9f72b41F88197d42BFc16BBBB064142EB6BFFEC5'
-}
+import {contracts } from "./contracts";
 
 export async function setupEnvironment(): Promise<any> {
-  const { admin, creator, trader } = await getSigners();
+  const { deployer, admin, creator, trader } = await getSigners();
 
+  console.log('deployer', deployer.address)
   console.log('admin', admin.address)
   console.log('creator', creator.address)
   console.log('trader', trader.address)
 
-  // const weth = await deploy('WETH', { args: [admin.address] });
-  const authorizer = (
-    await ethers.getContractFactory('Authorizer', admin)
-    ).attach(contracts.authorizer)
-  
+  const authorizer = (await ethers.getContractFactory('Authorizer', admin)).attach(contracts.authorizer)
+  const weth =  (await ethers.getContractFactory('WETH', admin)).attach(contracts.weth)
+  const vault = (await ethers.getContractFactory('Vault', admin)).attach(contracts.vault)
 
-  const weth =  (
-    await ethers.getContractFactory('WETH', admin)
-  ).attach('0x65976a250187cb1D21b7e3693aCF102d61c86177')
-  
-  // const WETH =  {
-  //   address: '0x65976a250187cb1D21b7e3693aCF102d61c86177'
-  // }
-  const vault = (
-    await ethers.getContractFactory('Vault', admin)
-  ).attach(contracts.vault)
-  
+  console.log('Vault', vault.address)
 
   // const authorizer = await deploy('Authorizer', { args: [admin.address] });
   
@@ -56,22 +39,23 @@ export async function setupEnvironment(): Promise<any> {
     
   console.log('deploy tokens')
   const tokens = await deploySortedTokens(tokenSymbols, Array(tokenSymbols.length).fill(18));
-
+ 
   const symbols = Object.keys(tokens);
   const tokenAddresses = symbols.map((symbol) => tokens[symbol].address);
 
+  
   for (const symbol in tokens) {
-    console.log('creator approving vault', tokens[symbol].address)
+    console.log('creator approve, mint tokens to trader, trader approve, token:', symbol)
+    // console.log('creator approving vault', tokens[symbol].address)
     // creator tokens are used to initialize pools, but tokens are only minted when required
     await tokens[symbol].connect(creator).approve(vault.address, MAX_UINT256);
     
-    console.log('minting', tokens[symbol].address)
+    // console.log('minting', tokens[symbol].address)
     // trader tokens are used to trade and not have non-zero balances
     await mintTokens(tokens, symbol, trader, 200e18);
 
-    console.log('trader approving vault')
+    // console.log('trader approving vault')
     await tokens[symbol].connect(trader).approve(vault.address, MAX_UINT256);
-    
   }
 
   // deposit internal balance for trader to make it non-zero
@@ -108,8 +92,14 @@ export async function deployPool(vault: Contract, tokens: TokenList, poolName: P
   let pool: Contract;
   let joinUserData: string;
 
+
+  console.log('get the pool')
+
   if (poolName == 'WeightedPool') {
     const weights = toNormalizedWeights(symbols.map(() => fp(1))); // Equal weights for all tokens
+    console.log('weights', weights)
+    console.log('creator', creator.address)
+    console.log([tokenAddresses, weights, swapFeePercentage])
     pool = await deployPoolFromFactory(vault, 'WeightedPool', {
       from: creator,
       parameters: [tokenAddresses, weights, swapFeePercentage],
@@ -148,7 +138,10 @@ export async function getWeightedPool(
   size: number,
   offset?: number
 ): Promise<string> {
-  return deployPool(vault, pickTokens(tokens, size, offset), 'WeightedPool');
+  console.log('getWeightedPool', size, offset)
+  const pool = await deployPool(vault, pickTokens(tokens, size, offset), 'WeightedPool');
+  console.log(pool)
+  return pool
 }
 
 export async function getStablePool(
@@ -169,13 +162,14 @@ export function pickTokenAddresses(tokens: TokenList, size: number, offset?: num
 }
 
 export async function getSigners(): Promise<{
+  deployer: SignerWithAddress;
   admin: SignerWithAddress;
   creator: SignerWithAddress;
   trader: SignerWithAddress;
 }> {
-  const [, admin, creator, trader] = await ethers.getSigners();
+  const [ deployer, admin, creator, trader] = await ethers.getSigners();
 
-  return { admin, creator, trader };
+  return { deployer, admin, creator, trader };
 }
 
 export function printGas(gas: number | BigNumber): string {
