@@ -33,6 +33,16 @@ export default class Token {
     return new Token(name, symbol, decimals, instance);
   }
 
+  static async from(address: string) {
+    const instance = await deployedAt('v2-solidity-utils/TestToken', TypesConverter.toAddress(address));
+    return new Token(
+      instance.name(),
+      instance.symbol(),
+      instance.decimals(),
+      instance
+    );
+  }
+
   constructor(name: string, symbol: string, decimals: number, instance: Contract) {
     this.name = name;
     this.symbol = symbol;

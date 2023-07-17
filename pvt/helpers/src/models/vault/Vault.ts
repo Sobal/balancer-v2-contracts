@@ -14,6 +14,9 @@ import { Account, NAry, TxParams } from '../types/types';
 import { ANY_ADDRESS, MAX_UINT256, ZERO_ADDRESS } from '../../constants';
 import { ExitPool, JoinPool, RawVaultDeployment, MinimalSwap, GeneralSwap, QueryBatchSwap, ProtocolFee } from './types';
 import { Interface } from '@ethersproject/abi';
+import { DEPLOYED_CONTRACTS } from '../../../plugins/deployedContracts';
+
+const DEFAULT_VAULT = '0x2e80d2Bf2a356F02c865cCc033EcC41746EA2Fe0';
 
 export default class Vault {
   mocked: boolean;
@@ -29,8 +32,28 @@ export default class Vault {
     return this.instance.interface;
   }
 
+
   static async create(deployment: RawVaultDeployment = {}): Promise<Vault> {
-    return VaultDeployer.deploy(deployment);
+    if (DEFAULT_VAULT === undefined) {
+      return VaultDeployer.deploy(deployment);
+    }
+
+    // these are NOT working
+    // we can null unncessary contracts
+    const vault = await deployedAt('v2-vault/Vault', DEPLOYED_CONTRACTS['Vault']);
+    const authorizer = await deployedAt('v2-vault/IAuthorizer', "0xc0388f3C1743280fa8368fA2551B61AFBCD68D1f");
+    const authorizerAdaptor = await deployedAt('v2-liquidity-mining/AuthorizerAdaptor', "0x57600F3B2d179792b4E6938dbCdB557feFF44e81");
+    const authorizerAdaptorEntrypoint = await deployedAt('v2-liquidity-mining/AuthorizerAdaptorEntrypoint', "0x712bE9a569B4D669A8c6c9832aaFcbD1464836e6");
+    const protocolFeesProvider = await deployedAt('v2-standalone-utils/ProtocolFeePercentagesProvider', "0xC547F9C9eE48434a425B8bD8d4cA8B68892C39b2");
+    return new Vault(
+      false,
+      vault,
+      authorizer,
+      authorizerAdaptor,
+      authorizerAdaptorEntrypoint,
+      protocolFeesProvider,
+      deployment.admin
+    )
   }
 
   constructor(
