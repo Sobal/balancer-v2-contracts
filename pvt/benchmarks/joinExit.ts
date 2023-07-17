@@ -49,6 +49,8 @@ async function main() {
       exitWeightedUserData
     );
   }
+
+  return;
   console.log('\n');
 
   for (let numTokens = managedPoolMin; numTokens <= managedPoolMax; numTokens += managedPoolStep) {

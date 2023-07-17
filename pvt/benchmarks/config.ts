@@ -12,14 +12,17 @@ type PoolConfig = {
 export const poolConfigs: Record<PoolType, PoolConfig> = {
   [PoolType.WEIGHTED_POOL]: {
     minTokens: 2,
-    maxTokens: 8,
+    maxTokens: 4,
+    // maxTokens: 8,
   },
   [PoolType.MANAGED_POOL]: {
     minTokens: 2,
-    maxTokens: 50,
+    maxTokens: 4,
+    // maxTokens: 50,
   },
   [PoolType.STABLE_POOL]: {
     minTokens: 2,
-    maxTokens: 5,
+    maxTokens: 4,
+    // maxTokens: 5,
   },
 };
