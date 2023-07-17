@@ -96,34 +96,37 @@ export default class TokenList {
 
   async mint(rawParams: RawTokenMint): Promise<void> {
     const params: TokenMint[] = TypesConverter.toTokenMints(rawParams);
-    await Promise.all(
-      params.flatMap(({ to, amount, from }) => this.tokens.map((token) => token.mint(to, amount, { from })))
-    );
+    for (let i = 0; i < params.length; i++) {
+      const { to, amount, from } = params[i]
+      await this.tokens[i].mint(to, amount, { from })
+    }
   }
 
   // Assumes the amount is an unscaled (non-FP) number, and will scale it by the decimals of the token
   // So passing in 100 to mint DAI, WBTC and USDC would result in fp(100), bn(100e8), bn(100e6): 100 tokens of each
   async mintScaled(rawParams: RawTokenMint): Promise<void> {
     const params: TokenMint[] = TypesConverter.toTokenMints(rawParams);
-
-    await Promise.all(
-      params.flatMap(({ to, amount, from }) =>
-        this.tokens.map((token) =>
-          token.mint(to, amount ? (Number(amount) * 10 ** token.decimals).toString() : 0, { from })
-        )
-      )
-    );
+    for (let i = 0; i < params.length; i++) {
+      const { to, amount, from } = params[i]
+      const token = this.tokens[i]
+      await token.mint(to, amount ? (Number(amount) * 10 ** token.decimals).toString() : 0, { from })
+    }
   }
 
   async approve(rawParams: RawTokenApproval): Promise<void> {
     const params: TokenApproval[] = TypesConverter.toTokenApprovals(rawParams);
-    await Promise.all(
-      params.flatMap(({ to, amount, from }) => this.tokens.map((token) => token.approve(to, amount, { from })))
-    );
+    for (let i = 0; i < params.length; i++) {
+      const { to, amount, from } = params[i]
+      await this.tokens[i].approve(to, amount, { from })
+    }
   }
 
   async balanceOf(account: Account): Promise<BigNumber[]> {
-    return Promise.all(this.tokens.map((token) => token.balanceOf(account)));
+    const balances = []
+    for (let i = 0; i < this.tokens.length; i++) {
+      balances.push(await this.tokens[i].balanceOf(account))
+    }
+    return balances
   }
 
   each(fn: (value: Token, i: number, array: Token[]) => void, thisArg?: unknown): void {
