@@ -1,3 +1,4 @@
+import "dotenv/config"
 import '@nomiclabs/hardhat-ethers';
 import '@nomiclabs/hardhat-waffle';
 import 'hardhat-ignore-warnings';
@@ -11,10 +12,25 @@ import overrideQueryFunctions from '@balancer-labs/v2-helpers/plugins/overrideQu
 
 task(TASK_COMPILE).setAction(overrideQueryFunctions);
 
+const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY || '';
+const ADMIN_PRIVATE_KEY = process.env.ADMIN_PRIVATE_KEY || '';
+
 export default {
   networks: {
     hardhat: {
       allowUnlimitedContractSize: true,
+    },
+    neonlabs: {
+      chainId: 245022934,
+      url: 'https://shadow-mainnet.neonevm.org/',
+      accounts: [DEPLOYER_PRIVATE_KEY, ADMIN_PRIVATE_KEY],
+      saveDeployments: true,
+    },
+    devnet: {
+      chainId: 245022926,
+      url: 'https://devnet.neonevm.org/',
+      accounts: [DEPLOYER_PRIVATE_KEY, ADMIN_PRIVATE_KEY],
+      saveDeployments: true,
     },
   },
   solidity: {
