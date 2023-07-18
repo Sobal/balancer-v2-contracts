@@ -61,7 +61,11 @@ contract ComposableStablePoolFactory is IVersion, IPoolVersion, BasePoolFactory,
         address owner,
         bytes32 salt
     ) external returns (ComposableStablePool) {
-        (uint256 pauseWindowDuration, uint256 bufferPeriodDuration) = getPauseConfiguration();
+        // NeonEVM has limited support of block.timestamp logic during contract deployment.
+        // So we're force to disable pause for now.
+        uint256 pauseWindowDuration = 0;
+        uint256 bufferPeriodDuration = 0;
+
         return
             ComposableStablePool(
                 _create(
