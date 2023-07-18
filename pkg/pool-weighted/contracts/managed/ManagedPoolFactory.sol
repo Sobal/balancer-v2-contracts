@@ -87,7 +87,10 @@ contract ManagedPoolFactory is IFactoryCreatedPoolVersion, Version, BasePoolFact
         address owner,
         bytes32 salt
     ) external returns (address pool) {
-        (uint256 pauseWindowDuration, uint256 bufferPeriodDuration) = getPauseConfiguration();
+        // NeonEVM has limited support of block.timestamp logic during contract deployment.
+        // So we're force to disable pause for now.
+        uint256 pauseWindowDuration = 0;
+        uint256 bufferPeriodDuration = 0;
 
         ManagedPool.ManagedPoolConfigParams memory configParams = ManagedPool.ManagedPoolConfigParams({
             vault: getVault(),
