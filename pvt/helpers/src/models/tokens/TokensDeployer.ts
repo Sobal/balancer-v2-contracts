@@ -19,7 +19,11 @@ class TokensDeployer {
       defaultSender,
       varyDecimals
     );
-    const tokens = await Promise.all(deployments.map(this.deployToken));
+    const tokens = []
+    for (let i = 0; i < deployments.length; i++) {
+      const token = await this.deployToken(deployments[i]);
+      tokens.push(token)
+    }
     const sortedTokens = sorted ? this._sortTokensDeployment(tokens, params) : tokens;
     return new TokenList(sortedTokens);
   }
@@ -30,7 +34,7 @@ class TokensDeployer {
 
     let instance;
     if (symbol !== 'WETH') {
-      instance = await deploy('v2-standalone-utils/TestToken', {
+      instance = await deploy('v2-solidity-utils/TestToken', {
         from: sender,
         args: [name, symbol, decimals],
       });

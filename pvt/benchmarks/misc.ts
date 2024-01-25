@@ -14,12 +14,18 @@ import { range } from 'lodash';
 import { ManagedPoolParams } from '@balancer-labs/v2-helpers/src/models/pools/weighted/types';
 import { poolConfigs } from './config';
 import { ProtocolFee } from '@balancer-labs/v2-helpers/src/models/vault/types';
+import { randomBytes } from 'ethers/lib/utils';
 
 const name = 'Balancer Pool Token';
 const symbol = 'BPT';
 
 const BASE_PAUSE_WINDOW_DURATION = MONTH * 3;
 const BASE_BUFFER_PERIOD_DURATION = MONTH;
+
+export function sleep(ms: number) {
+  console.log(`Sleeping for ${ms}ms...`);
+  return new Promise( resolve => setTimeout(resolve, ms) );
+}
 
 export async function setupEnvironment(): Promise<{
   vault: Vault;
@@ -29,6 +35,8 @@ export async function setupEnvironment(): Promise<{
 }> {
   const { admin, creator, trader, others } = await getSigners();
 
+  console.log(admin.address, creator.address, trader.address)
+
   const vault = await Vault.create({ admin });
 
   const tokens = await TokenList.create(
@@ -36,14 +44,21 @@ export async function setupEnvironment(): Promise<{
     { sorted: true }
   );
 
-  await tokens.asyncEach(async (token) => {
-    // creator tokens are used to initialize pools, but tokens are only minted when required
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens.get(i);
+    const balance = await token.balanceOf(trader.address)
+    if (balance.gt(fp(10000))) continue;
+
     await token.approve(vault, MAX_UINT256, { from: creator });
+    await sleep(2000)
 
     // trader tokens are used to trade and not have non-zero balances
-    await token.mint(trader, fp(200));
+    await token.mint(trader, fp(20000));
+    await sleep(2000)
+    
     await token.approve(vault, MAX_UINT256, { from: trader });
-  });
+    await sleep(2000)
+  }
 
   // deposit internal balance for trader to make it non-zero
   const transfers = tokens.map((token) => ({
@@ -63,9 +78,9 @@ export async function deployPool(vault: Vault, tokens: TokenList, poolName: Pool
   const { creator } = await getSigners();
 
   const initialPoolBalance = bn(100e18);
-  await tokens.asyncEach(async (token) => {
-    await token.mint(creator, initialPoolBalance);
-  });
+  for (let i = 0; i < tokens.length; i++) {
+    await tokens.get(i).mint(creator, initialPoolBalance);
+  }
 
   const swapFeePercentage = fp(0.02); // 2%
   const aumFee = 0;
@@ -151,7 +166,7 @@ export async function deployPool(vault: Vault, tokens: TokenList, poolName: Pool
   });
 
   // Force test to skip pause window
-  await advanceTime(MONTH * 5);
+  // await advanceTime(MONTH * 5);
 
   return poolId;
 }
@@ -247,9 +262,8 @@ async function deployPoolFromFactory(
     receipt = await (await factory.connect(args.from).create(...args.parameters, ZERO_BYTES32)).wait();
     event = receipt.events?.find((e) => e.event == 'PoolCreated');
   } else {
-    receipt = await (
-      await factory.connect(args.from).create(name, symbol, ...args.parameters, ZERO_ADDRESS, ZERO_BYTES32)
-    ).wait();
+    const tx = await factory.connect(args.from).create(name, symbol, ...args.parameters, ZERO_ADDRESS, ZERO_BYTES32)
+    receipt = await tx.wait(2);
     event = receipt.events?.find((e) => e.event == 'PoolCreated');
   }
 
@@ -259,3 +273,4 @@ async function deployPoolFromFactory(
 
   return deployedAt(fullName, event.args?.pool);
 }
+

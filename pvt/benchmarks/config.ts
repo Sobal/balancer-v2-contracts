@@ -16,10 +16,12 @@ export const poolConfigs: Record<PoolType, PoolConfig> = {
   },
   [PoolType.MANAGED_POOL]: {
     minTokens: 2,
-    maxTokens: 50,
+    maxTokens:4,
+    // maxTokens: 50,
   },
   [PoolType.STABLE_POOL]: {
     minTokens: 2,
-    maxTokens: 5,
+    maxTokens: 4,
+    // maxTokens: 5,
   },
 };

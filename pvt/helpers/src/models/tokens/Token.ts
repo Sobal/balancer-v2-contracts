@@ -20,7 +20,7 @@ export default class Token {
   }
 
   static async deployedAt(address: Account): Promise<Token> {
-    const instance = await deployedAt('v2-standalone-utils/TestToken', TypesConverter.toAddress(address));
+    const instance = await deployedAt('v2-solidity-utils/TestToken', TypesConverter.toAddress(address));
     const [name, symbol, decimals] = await Promise.all([instance.name(), instance.symbol(), instance.decimals()]);
     if (symbol === 'WETH') {
       return new Token(
@@ -31,6 +31,16 @@ export default class Token {
       );
     }
     return new Token(name, symbol, decimals, instance);
+  }
+
+  static async from(address: string) {
+    const instance = await deployedAt('v2-solidity-utils/TestToken', TypesConverter.toAddress(address));
+    return new Token(
+      instance.name(),
+      instance.symbol(),
+      instance.decimals(),
+      instance
+    );
   }
 
   constructor(name: string, symbol: string, decimals: number, instance: Contract) {
